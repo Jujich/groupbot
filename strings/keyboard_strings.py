@@ -1,0 +1,15 @@
+keyboard_strings: dict = {
+    "get_groups": "Список групп",
+    "add_group": "Добавить группу",
+    "back": "Назад",
+    "get_text": "Текст",
+    "get_schedule": "Дата отправки",
+    "edit": "Редактировать",
+    "edit_date": "Редактировать дату",
+    "edit_time": "Редактировать время",
+    "cancel_edit": "Назад",
+    "get_default_text": "Текст по умолчанию",
+    "edit_price": "Редактировать цену",
+    "edit_amount": "Редактировать количество",
+    "edit_text": "Редактировать текст",
+}
