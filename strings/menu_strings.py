@@ -26,9 +26,16 @@ menu_strings: dict = {
     "default_price": "Н/Д",
     "default_amount": "Н/Д",
     "edit_price": "Введите новую цену",
-    "edit_amount": "Введите новое количество занятий",
+    "get_amount": Template("Вот количество занятий на следующие месяцы:\n\n$schedule"),
+    "edit_amount": Template("Введите количество занятий на <b>$month</b>"),
+    "delete_amount": Template("Удалить количество занятий на <b>$month</b>?"),
+    "incorrect_amount": "Количество должо быть числом!",
     "incorrect_price": "Некорректно введена цена\nЦена должна быть положительным числом. Не указывайте единицы валюты",
     "left_group": Template("Покинута группа: <b>$title</b>"),
     "confirm_edit_price": Template("Новая цена: <b>$price</b>\n\nПрименить?"),
     "confirm_edit_amount": Template("Новое количество занятий: <b>$amount</b>\n\nПрименить?"),
+    "groups_send_messages_1": "Введите сообщение, которое вы хотите отправить в закрепленные за вами чаты",
+    "groups_send_messages_2": Template("Следующее сообщение будет отправлено в закрепленные за вами чаты:\n\n$text\n\nПродолжить?"),
+    "groups_send_messages_success": "Сообщения успешно отправлены",
+    "groups_send_messages_failure": Template("При отправке сообщения в группу <b>$group</b> проищошла ошибка!")
 }

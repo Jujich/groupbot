@@ -12,6 +12,9 @@ builder.row(
     InlineKeyboardButton(text=keyboard_strings["get_groups"], callback_data="get_groups"),
 )
 builder.row(
+    InlineKeyboardButton(text=keyboard_strings["groups_send_messages"], callback_data="groups_send_messages"),
+)
+builder.row(
     InlineKeyboardButton(text=keyboard_strings["get_default_text"], callback_data="get_default_text"),
     InlineKeyboardButton(text=keyboard_strings["get_schedule"], callback_data="get_schedule"),
 )
@@ -19,7 +22,7 @@ builder.row(
     InlineKeyboardButton(
         text=keyboard_strings["add_group"],
         callback_data="add_group",
-        url=f"https://t.me/{os.environ.get('BOT_USERNAME')}?startgroup=newgroups&admin=manage_chat+change_info+delete_messages+restrict_members+invite_users+promote_members"
+        url=f"https://t.me/{os.environ.get('GROUPBOT_USERNAME')}?startgroup=newgroups&admin=manage_chat+change_info+delete_messages+restrict_members+invite_users+promote_members"
     ),
 )
 start_keyboard = builder.as_markup()
@@ -47,8 +50,7 @@ builder.row(
     InlineKeyboardButton(text=keyboard_strings["edit_text"], callback_data="edit_text"),
 )
 builder.row(
-    InlineKeyboardButton(text=keyboard_strings["edit_amount"], callback_data="edit_amount"),
-    InlineKeyboardButton(text=keyboard_strings["edit_price"], callback_data="edit_price"),
+    InlineKeyboardButton(text=keyboard_strings["get_amount"], callback_data="get_amount"),
 )
 builder.row(
     InlineKeyboardButton(text=keyboard_strings["cancel_edit"], callback_data="cancel_edit"),
@@ -102,3 +104,23 @@ builder.add(
     InlineKeyboardButton(text="Нет", callback_data="No")
 )
 y_n_keyboard = builder.as_markup()
+
+
+builder = InlineKeyboardBuilder()
+builder.row(
+    InlineKeyboardButton(text=keyboard_strings["add_amount"], callback_data="add_amount"),
+)
+builder.row(
+    InlineKeyboardButton(text=keyboard_strings["delete_amount"], callback_data="delete_amount"),
+)
+builder.row(
+    InlineKeyboardButton(text=keyboard_strings["cancel_edit"], callback_data="cancel_edit"),
+)
+edit_amount_keyboard = builder.as_markup()
+
+
+builder = InlineKeyboardBuilder()
+builder.row(
+    InlineKeyboardButton(text=keyboard_strings["cancel_edit"], callback_data="cancel"),
+)
+cancel_keyboard = builder.as_markup()

@@ -10,24 +10,27 @@ from sqlalchemy import select
 from datetime import datetime
 from strings.menu_strings import menu_strings
 from string import Template
+import logging
 
 
 def insert_admin(data: dict) -> bool:
     session = Session(engine)
     try:
-        admin = Admin(
-            username="@" + data["username"],
-            tgId=data["tgId"],
-            join_date=str(datetime.now()).split('.')[0],
-            default_text=menu_strings["default_text"],
-            date=menu_strings["default_date"],
-            time=menu_strings["default_time"],
-        )
-        session.add(admin)
-        session.commit()
-        session.close()
+        if not admin_check_in_db(data["tgId"]):
+            admin = Admin(
+                username="@" + data["username"],
+                tgId=data["tgId"],
+                join_date=str(datetime.now()).split('.')[0],
+                default_text=menu_strings["default_text"],
+                date=menu_strings["default_date"],
+                time=menu_strings["default_time"],
+            )
+            session.add(admin)
+            session.commit()
+            session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -45,7 +48,8 @@ def insert_user(data: dict) -> bool:
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -56,6 +60,14 @@ def user_check_in_db(tgId: int) -> User:
     user = session.scalars(stmt).first()
     session.close()
     return user
+
+
+def admin_check_in_db(tgId: int) -> User:
+    session = Session(engine)
+    stmt = select(Admin).where(Admin.tgId == tgId)
+    admin = session.scalars(stmt).first()
+    session.close()
+    return admin
 
 
 def user_get_subscribed_channels(tgId: int) -> list:
@@ -75,7 +87,8 @@ def user_update_subscribed_channels(tgId: int, channel_id: int) -> bool:
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -90,7 +103,8 @@ def user_remove_subscribed_channel(tgId: int, channel_id: int) -> bool:
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -108,7 +122,7 @@ def delete_user(tgId: int, channel_id: int) -> bool:
         else:
             return False
     except Exception as e:
-        print(e)
+        logging.exception(e)
         session.close()
         return False
 
@@ -131,14 +145,14 @@ def insert_channel(data: dict) -> bool:
             title=data["title"],
             admin_tgid=data["adminTgId"],
             text=get_default_text(int(data["adminTgId"])),
-            price=menu_strings["default_price"],
-            amount=menu_strings["default_amount"],
+            schedule=json.dumps([])
         )
         session.add(channel)
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -156,7 +170,7 @@ def delete_channel(channel_id: int) -> bool:
         else:
             return False
     except Exception as e:
-        print(e)
+        logging.exception(e)
         session.close()
         return False
 
@@ -185,12 +199,11 @@ async def clear_left_channels() -> None:
     channels = get_all_channels()
     for channel in channels:
         try:
-            chat_member: ChatMember = await bot(GetChatMember(chat_id=channel.tgChannelId, user_id=bot.id))
-            if chat_member.status in ['member', 'administrator']:
-                pass
-            else:
+            chat_member: ChatMember = await bot.get_chat_member(channel.tgChannelId, bot.id)
+            if chat_member.status not in ['member', 'administrator']:
                 delete_channel(channel.tgChannelId)
-        except TelegramForbiddenError as e:
+        except Exception as e:
+            logging.exception(e)
             delete_channel(channel.tgChannelId)
 
 
@@ -216,11 +229,15 @@ def get_group_text(channel_id: int) -> Template:
     return Template(channel.text)
 
 
-def get_group_data(channel_id: int) -> dict:
+def get_group_schedule(channel_id: int) -> list:
     session = Session(engine)
     channel = session.query(Channel).filter(Channel.tgChannelId == channel_id).first()
     session.close()
-    return {"price": channel.price, "amount": channel.amount}
+    try:
+        return json.loads(channel.schedule)
+    except Exception as e:
+        logging.exception(e)
+        return []
 
 
 def update_schedule_time(admin_id: int, time: str) -> bool:
@@ -231,7 +248,8 @@ def update_schedule_time(admin_id: int, time: str) -> bool:
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -244,7 +262,8 @@ def update_schedule_date(admin_id: int, date: str) -> bool:
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -257,7 +276,8 @@ def update_group_text(channel_id: int, text: str) -> bool:
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -284,7 +304,8 @@ def update_default_text(admin_id: int, text: str) -> bool:
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -297,7 +318,8 @@ def update_group_price(channel_id: int, price: str) -> bool:
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False
 
@@ -306,10 +328,45 @@ def update_group_amount(channel_id: int, amount: str) -> bool:
     session = Session(engine)
     try:
         channel = session.query(Channel).filter(Channel.tgChannelId == channel_id).first()
-        channel.amount = amount
+        sched = json.loads(channel.schedule)
+        sched.append(amount)
+        channel.schedule = json.dumps(sched)
         session.commit()
         session.close()
         return True
-    except:
+    except Exception as e:
+        logging.exception(e)
+        session.close()
+        return False
+
+
+def delete_last_group_amount(channel_id: int) -> bool:
+    session = Session(engine)
+    try:
+        channel = session.query(Channel).filter(Channel.tgChannelId == channel_id).first()
+        sched = json.loads(channel.schedule)
+        sched.pop()
+        channel.schedule = json.dumps(sched)
+        session.commit()
+        session.close()
+        return True
+    except Exception as e:
+        logging.exception(e)
+        session.close()
+        return False
+
+
+def pop_group_schedule(channel_id: int) -> bool:
+    session = Session(engine)
+    try:
+        channel = session.query(Channel).filter(Channel.tgChannelId == channel_id).first()
+        sched = json.loads(channel.schedule)
+        sched.pop(0)
+        channel.schedule = json.dumps(sched)
+        session.commit()
+        session.close()
+        return True
+    except Exception as e:
+        logging.exception(e)
         session.close()
         return False

@@ -18,27 +18,46 @@ async def start(message: Message, state: FSMContext, main=True):
                 "tgId": message.from_user.id,
                 "username": message.from_user.username,
             }
-            insert_admin(data)
-            msg = await bot.send_message(
-                chat_id=message.chat.id,
-                text=message_strings["start"],
-                reply_markup=start_keyboard
-            )
-            await state.update_data(menu_id=msg.message_id)
-        else:
-            try:
-                state_data = await state.get_data()
-                menu_id = state_data["menu_id"]
-                await bot.edit_message_text(
-                    text=message_strings["start"],
+            if insert_admin(data):
+                msg = await bot.send_message(
                     chat_id=message.chat.id,
-                    message_id=menu_id,
+                    text=message_strings["start"],
                     reply_markup=start_keyboard
                 )
-            except:
+                await state.update_data(menu_id=msg.message_id)
+            else:
                 msg = await bot.send_message(
-                    text=message_strings["start"],
                     chat_id=message.chat.id,
+                    text="error",
+                    reply_markup=start_keyboard
+                )
+                await state.update_data(menu_id=msg.message_id)
+        else:
+            data = {
+                "tgId": message.from_user.id,
+                "username": message.from_user.username,
+            }
+            if insert_admin(data):
+                try:
+                    state_data = await state.get_data()
+                    menu_id = state_data["menu_id"]
+                    await bot.edit_message_text(
+                        text=message_strings["start"],
+                        chat_id=message.chat.id,
+                        message_id=menu_id,
+                        reply_markup=start_keyboard
+                    )
+                except:
+                    msg = await bot.send_message(
+                        text=message_strings["start"],
+                        chat_id=message.chat.id,
+                        reply_markup=start_keyboard
+                    )
+                    await state.update_data(menu_id=msg.message_id)
+            else:
+                msg = await bot.send_message(
+                    chat_id=message.chat.id,
+                    text="error",
                     reply_markup=start_keyboard
                 )
                 await state.update_data(menu_id=msg.message_id)

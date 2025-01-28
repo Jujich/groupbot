@@ -10,6 +10,11 @@ keyboard_strings: dict = {
     "cancel_edit": "Назад",
     "get_default_text": "Текст по умолчанию",
     "edit_price": "Редактировать цену",
-    "edit_amount": "Редактировать количество",
+    "edit_amount": "Количество занятий",
     "edit_text": "Редактировать текст",
+    "groups_send_messages": "Рассылки",
+    "get_amount": "Количество занятий",
+    "edit_group_schedule": "Редактировать",
+    "add_amount": "Добавить количество",
+    "delete_amount": "Удалить количество"
 }

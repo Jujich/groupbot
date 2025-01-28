@@ -30,7 +30,7 @@ async def enter_text(message: Message, state: FSMContext):
         chat_id=message.chat.id,
         message_id=message.message_id
     )
-    if 1 < day < 28:
+    if 1 <= day <= 28:
         await bot.edit_message_text(
             chat_id=message.chat.id,
             message_id=state_data["menu_id"],

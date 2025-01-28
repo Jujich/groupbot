@@ -42,8 +42,7 @@ class Channel(Base):
     title: Mapped[str] = mapped_column(String)
     admin_tgid: Mapped[int] = mapped_column(INT, ForeignKey(Admin.tgId))
     text: Mapped[str] = mapped_column(String)
-    price: Mapped[str] = mapped_column(INT)
-    amount: Mapped[str] = mapped_column(INT)
+    schedule: Mapped[str] = mapped_column(String)
 
     def __repr__(self) -> str:
         return f"Channel(id={self.id}, tgChannelId={self.tgChannelId}, title={self.title}, admin_tgid={self.admin_tgid})"
